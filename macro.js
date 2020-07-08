@@ -287,10 +287,18 @@ function clear_background() {
 function verified_with_card() {
   // for a card to be verified, it just needs to have the parantheses around it removed
   var spreadsheet = SpreadsheetApp.getActive();
-  var value = spreadsheet.getCurrentCell().getValue();
-  // remove "("
-  var new_value = value.replace("(","")
-  // remove ")"
-  new_value = new_value.replace(")", "")
-  spreadsheet.getCurrentCell().setValue(new_value);
+  // apply parantheses removal to all active cells
+  var range = SpreadsheetApp.getActiveSheet().getActiveRange();
+  var to_write_ls = []
+  for (var i = 1; i <= range.getNumRows(); i++) {
+    var row = []
+    for (var j = 1; j <= range.getNumColumns(); j++) {
+      var cur_value = range.getCell(i,j).getValue();
+      // remove parantheses
+      var new_value = cur_value.replace("(","").replace(")","");
+      row.push(new_value)
+    }
+    to_write_ls.push(row)
+  }
+  range.setValues(to_write_ls)
 };
