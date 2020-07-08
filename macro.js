@@ -290,7 +290,7 @@ function verified_with_card() {
   var value = spreadsheet.getCurrentCell().getValue();
   // remove "("
   var new_value = value.replace("(","")
-  // remov ")"
+  // remove ")"
   new_value = new_value.replace(")", "")
   spreadsheet.getCurrentCell().setValue(new_value);
 };
