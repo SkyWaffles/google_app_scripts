@@ -161,7 +161,6 @@ function NewSheetSpending(new_month, new_name, new_index) {
     // fill in dailies
     row -= 1;
     curSheet.getRange(row, col_daily_spending).setFormula('=SUM('+col_spent_letter+start_row+':'+col_spent_letter+end_row+')')
-    curSheet.getRange(row, col_residual).setFormula('=B1-'+get_address(row, col_daily_spending))
 
     row += 1;
   });
