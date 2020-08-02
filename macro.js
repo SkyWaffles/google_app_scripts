@@ -37,20 +37,23 @@ function Duplicate_Budget() {
       var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
 
       // check to see that Budget Sheet exists before creating Spending Sheet
-      var budget_exists = false;
+      // and also store the current sheet name at the same time (to get sheet index)
+      var budget_name = null; // store name of sheet if it exists
       for (var i=0 ; i<sheets.length ; i++){
         var curName = sheets[i].getName();
         var curName_ls = get_date_string(curName);
         const budget_date_string = curName_ls[0].slice(2);
         const budget_category = curName_ls[1];
         if (budget_category == 'Budget' && budget_date_string == new_date_formatted.slice(0,6)){
-          budget_exists = true;
+          budget_name = curName;
           break;
         }
       }
 
-      if (budget_exists == true) {
-        NewSheetSpending(newDate, new_date_formatted);
+      if (budget_name != null) {
+        // 'Spending' sheet should always come before 'Budget' sheet for that month
+        new_index = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(curName).getIndex();
+        NewSheetSpending(newDate, new_date_formatted, new_index);
       } else {
         throw ("Error: Budget Sheet not yet created for this month. Please create Budget Sheet first")
       }
@@ -99,14 +102,12 @@ col_daily_spending = budget_header[0].indexOf('Daily Spending') + 1;
 col_daily_spending_letter = String.fromCharCode(budget_header[0].indexOf('Daily Spending') + 65);
 col_residual = budget_header[0].indexOf('Residual') + 1;
 col_residual_letter = String.fromCharCode(budget_header[0].indexOf('Residual') + 65);
-function NewSheetSpending(new_month, sheet_name) {
+function NewSheetSpending(new_month, new_name, new_index) {
   var spreadsheet = SpreadsheetApp.getActive();
-  spreadsheet.duplicateActiveSheet().setName(sheet_name);
-  // spreadsheet.insertSheet(9).setName(sheet_name);
-  SpreadsheetApp.getActiveSpreadsheet().moveActiveSheet(9);
+  spreadsheet.duplicateActiveSheet().setName(new_name);
+  SpreadsheetApp.getActiveSpreadsheet().moveActiveSheet(new_index);
   
   const curSheet = spreadsheet.getActiveSheet();
-  // curSheet.getRange(2, 1, 502, 14).clearContent();
   curSheet.getRange(header_rows, 1, header_rows+total_records, budget_header[0].length).clearContent();
   var default_style = spreadsheet.getRange('A1').getTextStyle()
   // set daily budget
