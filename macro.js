@@ -107,16 +107,18 @@ function NewSheetSpending(new_month, new_name, new_index) {
   SpreadsheetApp.getActiveSpreadsheet().moveActiveSheet(new_index);
   
   const curSheet = spreadsheet.getActiveSheet();
+  // clear sheet
   curSheet.getRange(header_rows, 1, header_rows+total_records, budget_header[0].length).clearContent();
   var default_style = spreadsheet.getRange('A1').getTextStyle()
   // set daily budget
   spreadsheet.getRange("A1").setValue('Daily Budget').setTextStyle(default_style);
-  // setup sum for Spending column
+  // setup sum for 'Daily Spending' column
   spreadsheet.getRange(col_spent_letter+"1").setValue('=SUM('+col_spent_letter+(header_rows+1)+':'+col_spent_letter+total_records+')')
+  // set 'Running Residual' label above 'Item' column
   curSheet.getRange(1, budget_header[0].indexOf('Item')+1).setValue('Running Residual');
   curSheet.getRange(1, col_category).setValue('=SUM('+col_residual_letter+(header_rows+1)+':'+col_residual_letter+total_records+')');
   
-  // link to Budget Sheet
+  // link Daily Spending limit to Budget Sheet
   const new_yy_mmm_str = new_month.getFullYear().toString().slice(-2).concat('-', new_month.toString().slice(4,7));
   spreadsheet.getRange("B1").setFormula('=\'' + new_yy_mmm_str +'-Budget\'!E2').setTextStyle(default_style);
   // fill out column headers
@@ -139,13 +141,13 @@ function NewSheetSpending(new_month, new_name, new_index) {
       curSheet.getRange(row, col_day).setFormula('=Text(WEEKDAY('+ col_date_letter + row + '),"DDDD")')
       
       // fill in dropdowns
-      // category dropdown column
+      // 'category' dropdown column
       curSheet.getRange(row, col_category).setDataValidation(SpreadsheetApp.newDataValidation()
       .setAllowInvalid(true)
       .requireValueInRange(spreadsheet.getRange('\'List of options\'!$B$2:$B$100'), true)
       .build());
       
-      // verified dropdown column
+      // 'credit card verification' dropdown column
       curSheet.getRange(row, col_verified).setDataValidation(SpreadsheetApp.newDataValidation()
       .setAllowInvalid(true)
       .requireValueInRange(spreadsheet.getRange('\'List of options\'!$C$2:$C$100'), true)
