@@ -114,8 +114,9 @@ function NewSheetSpending(new_month, new_name, new_index) {
   spreadsheet.getRange("A1").setValue('Daily Budget').setTextStyle(default_style);
   // setup sum for 'Daily Spending' column
   spreadsheet.getRange(col_spent_letter+"1").setValue('=SUM('+col_spent_letter+(header_rows+1)+':'+col_spent_letter+total_records+')')
-  // set 'Running Residual' label above 'Item' column
+  // write 'Running Residual' label above 'Item' column
   curSheet.getRange(1, budget_header[0].indexOf('Item')+1).setValue('Running Residual');
+  // setup sum for 'Residual' column
   curSheet.getRange(1, col_category).setValue('=SUM('+col_residual_letter+(header_rows+1)+':'+col_residual_letter+total_records+')');
   
   // link Daily Spending limit to Budget Sheet
