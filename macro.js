@@ -52,8 +52,7 @@ function Duplicate_Budget() {
 
       if (budget_name != null) {
         // 'Spending' sheet should always come before 'Budget' sheet for that month
-        new_index = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(curName).getIndex();
-        NewSheetSpending(newDate, new_date_formatted, new_index);
+        NewSheetSpending(newDate, new_date_formatted, sheet_index-1);
       } else {
         throw ("Error: Budget Sheet not yet created for this month. Please create Budget Sheet first")
       }
