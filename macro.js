@@ -303,3 +303,38 @@ function verified_with_card() {
   }
   range.setValues(to_write_ls)
 };
+
+function standardize_all_spending() {
+  // var spreadsheet = SpreadsheetApp.getActive();
+  var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+  for (var i=0 ; i<sheets.length ; i++){
+    var sheet = sheets[i]
+    var curName = sheet.getName();
+    if (curName.includes('Spending')){
+      standardize_spending(sheet)
+    }
+  }
+};
+
+function standardize_spending(sheet){
+  if (sheet === undefined){
+    var spreadsheet = SpreadsheetApp.getActive();
+    var sheet = spreadsheet.getActiveSheet();
+  }
+  sheet.setColumnWidth(1, 83)
+      .setColumnWidth(2, 80)
+      .setColumnWidth(3, 64)
+      .setColumnWidth(4, 73)
+      .setColumnWidth(5, 160)
+      .setColumnWidth(6, 110)
+      .setColumnWidth(7, 100)
+      .setColumnWidth(8, 100)
+      .setColumnWidth(9, 100)
+      .setColumnWidth(10, 180)
+      .setColumnWidth(11, 360)
+      .setColumnWidth(12, 98)
+      .setColumnWidth(13, 88);
+      sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns()).setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
+      sheet.getRange('A1:A717').clearDataValidations();
+      conditional_formatting();
+}
