@@ -237,6 +237,9 @@ function calculate_residuals() {
 };
 
 function conditional_formatting() {
+  // max edge of highlighted range
+  const last_column = 'M'
+  const last_row = '787'
   var spreadsheet = SpreadsheetApp.getActive();
   var sheet = spreadsheet.getActiveSheet();
   // clear background colors
@@ -246,28 +249,24 @@ function conditional_formatting() {
   sheet.clearConditionalFormatRules();
   sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns()).activate();
   var conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
-  // set Sunday rows to have gold background
-  conditionalFormatRules.push(SpreadsheetApp.newConditionalFormatRule()
-  .setRanges([spreadsheet.getRange('A1:AB787')])
-  .whenFormulaSatisfied('=$A$1:$A$792="Sunday"')
-  .setBackground('#FCE8B2')
-  .build());
-  // set Monday rows to have green background
-  conditionalFormatRules.push(SpreadsheetApp.newConditionalFormatRule()
-  .setRanges([spreadsheet.getRange('A1:AB787')])
-  .whenFormulaSatisfied('=$A$1:$A$792="Monday"')
-  .setBackground('#B7E1CD')
-  .build());
-  conditionalFormatRules.push(SpreadsheetApp.newConditionalFormatRule()
-  .setRanges([spreadsheet.getRange('A1:AB787')])
-  .whenFormulaSatisfied('=$A$1:$A$792="Wednesday"')
-  .setBackground('#B7E1CD')
-  .build());
-  conditionalFormatRules.push(SpreadsheetApp.newConditionalFormatRule()
-  .setRanges([spreadsheet.getRange('A1:AB787')])
-  .whenFormulaSatisfied('=$A$1:$A$792="Friday"')
-  .setBackground('#B7E1CD')
-  .build());
+  var highlighted_range = 'A1:'+ last_column + last_row
+  const Color = {
+    gold: '#FCE8B2'
+    ,green: '#B7E1CD'
+  }
+  var color_by_day = {
+    "Sunday": Color.gold
+    ,"Monday": Color.green
+    ,"Wednesday": Color.green
+    ,"Friday": Color.green
+  }
+  for(var day in color_by_day){
+    conditionalFormatRules.push(SpreadsheetApp.newConditionalFormatRule()
+    .setRanges([spreadsheet.getRange(highlighted_range)])
+    .whenFormulaSatisfied('=$A$1:$A$792='+'"'+day+'"')
+    .setBackground(color_by_day[day])
+    .build());
+  }
   spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
 
   // conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
