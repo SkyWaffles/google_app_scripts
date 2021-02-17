@@ -69,17 +69,18 @@ function getDaysInMonth(year_month) {
 TOTAL_RECORDS = 500;
 HEADER_NUM_ROWS = 2;
 BUDGET_HEADERS = ["Day","Date","Time","Spent","Item","Category","Brand","Store","Store City", "Verified","Note","Daily Spending","Residual"]
-col_date = BUDGET_HEADERS.indexOf('Date') + 1;
-col_date_letter = String.fromCharCode(BUDGET_HEADERS.indexOf('Date') + 65);
-col_day = BUDGET_HEADERS.indexOf('Day') + 1;
-col_category = BUDGET_HEADERS.indexOf('Category') + 1;
-col_verified = BUDGET_HEADERS.indexOf('Verified') + 1;
-col_spent = BUDGET_HEADERS.indexOf('Spent');
-col_spent_letter = String.fromCharCode(BUDGET_HEADERS.indexOf('Spent') + 65);
-col_daily_spending = BUDGET_HEADERS.indexOf('Daily Spending') + 1;
-col_daily_spending_letter = String.fromCharCode(BUDGET_HEADERS.indexOf('Daily Spending') + 65);
-col_residual = BUDGET_HEADERS.indexOf('Residual') + 1;
-col_residual_letter = String.fromCharCode(BUDGET_HEADERS.indexOf('Residual') + 65);
+// create Header index and letter objects to store header information
+var HeaderIndex = {}
+var HeaderLetter = {}
+for(let i = 0; i < BUDGET_HEADERS.length; i++){
+  let column_index = i + 1;
+  let column_key = BUDGET_HEADERS[i].toLowerCase().replace(/[\s-]+/g,"_");
+  let column_letter = String.fromCharCode(i + 65);
+  // write string name to object key
+  eval('HeaderIndex.' + column_key + ' = ' + column_index);
+  eval('HeaderLetter.' + column_key + ' = ' + '"' + column_letter + '"');
+}
+
 function NewSheetSpending(new_month, new_name, new_index) {
   var spreadsheet = SpreadsheetApp.getActive();
   spreadsheet.duplicateActiveSheet().setName(new_name);
@@ -92,11 +93,11 @@ function NewSheetSpending(new_month, new_name, new_index) {
   // set daily budget
   spreadsheet.getRange("A1").setValue('Daily Budget').setTextStyle(default_style);
   // setup sum for 'Daily Spending' column
-  spreadsheet.getRange(col_spent_letter+"1").setValue('=SUM('+col_spent_letter+(HEADER_NUM_ROWS+1)+':'+col_spent_letter+TOTAL_RECORDS+')')
+  spreadsheet.getRange(HeaderLetter.spent+"1").setValue('=SUM('+HeaderLetter.spent+(HEADER_NUM_ROWS+1)+':'+HeaderLetter.spent+TOTAL_RECORDS+')')
   // write 'Running Residual' label above 'Item' column
   curSheet.getRange(1, BUDGET_HEADERS.indexOf('Item')+1).setValue('Running Residual');
   // setup sum for 'Residual' column
-  curSheet.getRange(1, col_category).setValue('=SUM('+col_residual_letter+(HEADER_NUM_ROWS+1)+':'+col_residual_letter+TOTAL_RECORDS+')');
+  curSheet.getRange(1, HeaderIndex.category).setValue('=SUM('+HeaderLetter.residual+(HEADER_NUM_ROWS+1)+':'+HeaderLetter.residual+TOTAL_RECORDS+')');
   
   // link Daily Spending limit to Budget Sheet
   const new_yy_mmm_str = new_month.getFullYear().toString().slice(-2).concat('-', new_month.toString().slice(4,7));
@@ -116,19 +117,19 @@ function NewSheetSpending(new_month, new_name, new_index) {
     const start_row = row;
     for (i = 0; i < num_rows_per_day; i++){
       // date
-      curSheet.getRange(row, col_date).setValue(day)
+      curSheet.getRange(row, HeaderIndex.date).setValue(day)
       // day of the week
-      curSheet.getRange(row, col_day).setFormula('=Text(WEEKDAY('+ col_date_letter + row + '),"DDDD")')
+      curSheet.getRange(row, HeaderIndex.day).setFormula('=Text(WEEKDAY('+ HeaderLetter.date + row + '),"DDDD")')
       
       // fill in dropdowns
       // 'category' dropdown column
-      curSheet.getRange(row, col_category).setDataValidation(SpreadsheetApp.newDataValidation()
+      curSheet.getRange(row, HeaderIndex.category).setDataValidation(SpreadsheetApp.newDataValidation()
       .setAllowInvalid(true)
       .requireValueInRange(spreadsheet.getRange('\'List of options\'!$B$2:$B$100'), true)
       .build());
       
       // 'credit card verification' dropdown column
-      curSheet.getRange(row, col_verified).setDataValidation(SpreadsheetApp.newDataValidation()
+      curSheet.getRange(row, HeaderIndex.verified).setDataValidation(SpreadsheetApp.newDataValidation()
       .setAllowInvalid(true)
       .requireValueInRange(spreadsheet.getRange('\'List of options\'!$C$2:$C$100'), true)
       .build());
@@ -139,7 +140,7 @@ function NewSheetSpending(new_month, new_name, new_index) {
     
     // fill in dailies
     row -= 1;
-    curSheet.getRange(row, col_daily_spending).setFormula('=SUM('+col_spent_letter+start_row+':'+col_spent_letter+end_row+')')
+    curSheet.getRange(row, HeaderIndex.daily_spending).setFormula('=SUM('+HeaderLetter.spent+start_row+':'+HeaderLetter.spent+end_row+')')
 
     row += 1;
   });
@@ -167,18 +168,16 @@ function calculate_residuals() {
 
   if (curSheet_name.includes('Spending')){
     // clear old values
-    const col_daily_spending = BUDGET_HEADERS.indexOf('Daily Spending') + 1;
-    const col_residual = BUDGET_HEADERS.indexOf('Residual') + 1;
     const row_data_start = 3;
-    const width_col = col_residual - col_daily_spending + 1;
-    curSheet.getRange(row_data_start, col_daily_spending, TOTAL_RECORDS, width_col).clear({contentsOnly: true, skipFilteredRows: true});
+    const width_col = HeaderIndex.residual - HeaderIndex.daily_spending + 1;
+    curSheet.getRange(row_data_start, HeaderIndex.daily_spending, TOTAL_RECORDS, width_col).clear({contentsOnly: true, skipFilteredRows: true});
 
     var date_str = null;
     var prev_date = null;
     var row = HEADER_NUM_ROWS;
     var stored_row = 0;
     for (var i = 0; i < TOTAL_RECORDS; i++){
-      date_str = curSheet.getRange(row, col_date).getValue();
+      date_str = curSheet.getRange(row, HeaderIndex.date).getValue();
       date = new Date(date_str);
       // check that date is valid
       if (date instanceof Date && !isNaN(date)){
@@ -188,21 +187,21 @@ function calculate_residuals() {
           stored_row = row;
         } else if ( prev_date.getTime() !== date.getTime() && stored_row < row ){
           const prev_row = row-1;
-          var formula_sum = '=SUM('+col_spent_letter+stored_row+':'+col_spent_letter+prev_row+')';
-          var formual_residual = '=B1-' + col_daily_spending_letter + prev_row;
-          curSheet.getRange(prev_row, col_daily_spending).setFormula(formula_sum);
-          curSheet.getRange(prev_row, col_residual).setFormula(formual_residual);
+          var formula_sum = '=SUM('+HeaderLetter.spent+stored_row+':'+HeaderLetter.spent+prev_row+')';
+          var formual_residual = '=B1-' + HeaderLetter.daily_spending + prev_row;
+          curSheet.getRange(prev_row, HeaderIndex.daily_spending).setFormula(formula_sum);
+          curSheet.getRange(prev_row, HeaderIndex.residual).setFormula(formual_residual);
           prev_date = date;
           stored_row = row;
-          // curSheet.getRange(stored_row, col_spent, row-1, 0)
+          // curSheet.getRange(stored_row, HeaderIndex.spent, row-1, 0)
         };
       } else if (prev_date){
         // deal with last row
         const prev_row = row-1;
-        var formula_sum = '=SUM('+col_spent_letter+stored_row+':'+col_spent_letter+prev_row+')';
-        var formual_residual = '=B1-' + col_daily_spending_letter + prev_row;
-        curSheet.getRange(prev_row, col_daily_spending).setFormula(formula_sum);
-        curSheet.getRange(prev_row, col_residual).setFormula(formual_residual);
+        var formula_sum = '=SUM('+HeaderLetter.spent+stored_row+':'+HeaderLetter.spent+prev_row+')';
+        var formual_residual = '=B1-' + HeaderLetter.daily_spending + prev_row;
+        curSheet.getRange(prev_row, HeaderIndex.daily_spending).setFormula(formula_sum);
+        curSheet.getRange(prev_row, HeaderIndex.residual).setFormula(formual_residual);
         date = null;
         break;
       }
