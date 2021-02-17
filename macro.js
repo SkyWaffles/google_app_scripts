@@ -145,6 +145,7 @@ function NewSheetSpending(new_month, new_name, new_index) {
     row += 1;
   });
 
+  calculate_residuals()
   // // add row colors
   // var conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
   // spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
