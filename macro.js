@@ -49,7 +49,7 @@ function Duplicate_Budget() {
   };
 };
 
-function link_cell() {
+function __link_cell() {
   var spreadsheet = SpreadsheetApp.getActive();
   spreadsheet.getRange('B1').activate();
   spreadsheet.getCurrentCell().setFormula('=\'20-Mar-Budget\'!E2');
