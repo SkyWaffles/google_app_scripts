@@ -68,18 +68,18 @@ function getDaysInMonth(year_month) {
 
 total_records = 500;
 header_rows = 2;
-budget_header = [["Day","Date","Time","Spent","Item","Category","Brand","Store","Store City", "Verified","Note","Daily Spending","Residual"]]
-col_date = budget_header[0].indexOf('Date') + 1;
-col_date_letter = String.fromCharCode(budget_header[0].indexOf('Date') + 65);
-col_day = budget_header[0].indexOf('Day') + 1;
-col_category = budget_header[0].indexOf('Category') + 1;
-col_verified = budget_header[0].indexOf('Verified') + 1;
-col_spent = budget_header[0].indexOf('Spent');
-col_spent_letter = String.fromCharCode(budget_header[0].indexOf('Spent') + 65);
-col_daily_spending = budget_header[0].indexOf('Daily Spending') + 1;
-col_daily_spending_letter = String.fromCharCode(budget_header[0].indexOf('Daily Spending') + 65);
-col_residual = budget_header[0].indexOf('Residual') + 1;
-col_residual_letter = String.fromCharCode(budget_header[0].indexOf('Residual') + 65);
+budget_header = ["Day","Date","Time","Spent","Item","Category","Brand","Store","Store City", "Verified","Note","Daily Spending","Residual"]
+col_date = budget_header.indexOf('Date') + 1;
+col_date_letter = String.fromCharCode(budget_header.indexOf('Date') + 65);
+col_day = budget_header.indexOf('Day') + 1;
+col_category = budget_header.indexOf('Category') + 1;
+col_verified = budget_header.indexOf('Verified') + 1;
+col_spent = budget_header.indexOf('Spent');
+col_spent_letter = String.fromCharCode(budget_header.indexOf('Spent') + 65);
+col_daily_spending = budget_header.indexOf('Daily Spending') + 1;
+col_daily_spending_letter = String.fromCharCode(budget_header.indexOf('Daily Spending') + 65);
+col_residual = budget_header.indexOf('Residual') + 1;
+col_residual_letter = String.fromCharCode(budget_header.indexOf('Residual') + 65);
 function NewSheetSpending(new_month, new_name, new_index) {
   var spreadsheet = SpreadsheetApp.getActive();
   spreadsheet.duplicateActiveSheet().setName(new_name);
@@ -87,14 +87,14 @@ function NewSheetSpending(new_month, new_name, new_index) {
   
   const curSheet = spreadsheet.getActiveSheet();
   // clear sheet
-  curSheet.getRange(header_rows, 1, header_rows+total_records, budget_header[0].length).clearContent();
+  curSheet.getRange(header_rows, 1, header_rows+total_records, budget_header.length).clearContent();
   var default_style = spreadsheet.getRange('A1').getTextStyle()
   // set daily budget
   spreadsheet.getRange("A1").setValue('Daily Budget').setTextStyle(default_style);
   // setup sum for 'Daily Spending' column
   spreadsheet.getRange(col_spent_letter+"1").setValue('=SUM('+col_spent_letter+(header_rows+1)+':'+col_spent_letter+total_records+')')
   // write 'Running Residual' label above 'Item' column
-  curSheet.getRange(1, budget_header[0].indexOf('Item')+1).setValue('Running Residual');
+  curSheet.getRange(1, budget_header.indexOf('Item')+1).setValue('Running Residual');
   // setup sum for 'Residual' column
   curSheet.getRange(1, col_category).setValue('=SUM('+col_residual_letter+(header_rows+1)+':'+col_residual_letter+total_records+')');
   
@@ -104,8 +104,8 @@ function NewSheetSpending(new_month, new_name, new_index) {
   // fill out column headers
   var row = 2;
   var col = 1;
-  curSheet.getRange(row, col, 1, budget_header[0].length).setValues(budget_header);
-  // spreadsheet.getRange("A2").setValue(budget_header[0].length).setTextStyle(default_style);
+  curSheet.getRange(row, col, 1, budget_header.length).setValues([budget_header]);
+  // spreadsheet.getRange("A2").setValue(budget_header.length).setTextStyle(default_style);
   // loop through days of the month
   row = 3;
   const days = getDaysInMonth(new_month);
@@ -167,8 +167,8 @@ function calculate_residuals() {
 
   if (curSheet_name.includes('Spending')){
     // clear old values
-    const col_daily_spending = budget_header[0].indexOf('Daily Spending') + 1;
-    const col_residual = budget_header[0].indexOf('Residual') + 1;
+    const col_daily_spending = budget_header.indexOf('Daily Spending') + 1;
+    const col_residual = budget_header.indexOf('Residual') + 1;
     const row_data_start = 3;
     const width_col = col_residual - col_daily_spending + 1;
     curSheet.getRange(row_data_start, col_daily_spending, total_records, width_col).clear({contentsOnly: true, skipFilteredRows: true});
