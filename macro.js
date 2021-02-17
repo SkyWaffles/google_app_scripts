@@ -1,14 +1,3 @@
-function UntitledMacro() {
-  var spreadsheet = SpreadsheetApp.getActive();
-  spreadsheet.getRange('A1').activate();
-  spreadsheet.setActiveSheet(spreadsheet.getSheetByName('18-Dec-Spending'), true);
-  spreadsheet.setActiveSheet(spreadsheet.getSheetByName('19-Jan-Spending'), true);
-  spreadsheet.setActiveSheet(spreadsheet.getSheetByName('19-Jan-Budget'), true);
-  spreadsheet.getRange('C13').activate();
-  spreadsheet.getCurrentCell().setValue('write something here');
-  spreadsheet.getRange('C14').activate();
-};
-
 function get_date_string(curSheet_name){
   var text_as_array = curSheet_name.split("-");
   var category = text_as_array[2];
@@ -58,16 +47,6 @@ function Duplicate_Budget() {
       }
     }
   };
-};
-
-function DeleteNumbers() {
-  var spreadsheet = SpreadsheetApp.getActive();
-  spreadsheet.getRange('B3').activate();
-  var currentCell = spreadsheet.getCurrentCell();
-  spreadsheet.getSelection().getNextDataRange(SpreadsheetApp.Direction.DOWN).activate();
-  currentCell.activateAsCurrentCell();
-  spreadsheet.getRange('B3:D52').activate();
-  spreadsheet.getActiveRangeList().clear({contentsOnly: true, skipFilteredRows: true});
 };
 
 function link_cell() {
