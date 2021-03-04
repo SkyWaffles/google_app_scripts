@@ -58,7 +58,7 @@ function New_spending_sheet() {
   var curSheet_name = curSheet.getSheetName()
   var sheet_index = curSheet.getIndex();
   if (curSheet_name.includes('Spend')){
-    var new_sheet_name = get_new_month(curSheet_name).sheet_name;
+    let new_sheet_name = get_new_month(curSheet_name).sheet_name;
     var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
 
     // check to see that Budget Sheet exists before creating Spending Sheet
@@ -77,7 +77,7 @@ function New_spending_sheet() {
 
     if (budget_name != null) {
       // 'Spending' sheet should always come before 'Budget' sheet for that month
-      NewSheetSpending(newDate, new_sheet_name, sheet_index-1);
+      NewSheetSpending(get_new_month(curSheet_name).date, new_sheet_name, sheet_index-1);
     } else {
       throw ("Error: Budget Sheet not yet created for this month. Please create Budget Sheet first")
     }
