@@ -5,6 +5,15 @@ function get_date_string(curSheet_name){
   return [date_string, category]
 }
 
+function create_sheet_name(curSheet_name){
+  var parsed_name = get_date_string(curSheet_name);
+  var date_string = parsed_name[0];
+  var date = new Date(date_string);
+  var category = parsed_name[1];
+  var newDate = new Date(date.setMonth(date.getMonth()+1));
+  return date.getFullYear().toString().slice(-2).concat('-', newDate.toString().slice(4,7),'-', category);
+}
+
 function Duplicate_Budget() {
   var spreadsheet = SpreadsheetApp.getActive();
   var default_style = spreadsheet.getRange('A1').getTextStyle()
@@ -13,14 +22,9 @@ function Duplicate_Budget() {
   
   if (curSheet_name.includes('Budget') || curSheet_name.includes('Spending')){
     var sheet_index = curSheet.getIndex();
-    var parsed_name = get_date_string(curSheet_name)
-    var date_string = parsed_name[0]
-    var date = new Date(date_string);
-    var category = parsed_name[1]
-    var newDate = new Date(date.setMonth(date.getMonth()+1))
-    var new_date_formatted = date.getFullYear().toString().slice(-2).concat('-', newDate.toString().slice(4,7),'-', category);
+    var new_sheet_name = create_sheet_name(curSheet_name)
     if (curSheet_name.includes('Budget')){
-      spreadsheet.duplicateActiveSheet().setName(new_date_formatted);
+      spreadsheet.duplicateActiveSheet().setName(new_sheet_name);
       SpreadsheetApp.getActiveSpreadsheet().moveActiveSheet(sheet_index);
     } else {
       var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
@@ -33,7 +37,7 @@ function Duplicate_Budget() {
         var curName_ls = get_date_string(curName);
         const budget_date_string = curName_ls[0].slice(2);
         const budget_category = curName_ls[1];
-        if (budget_category == 'Budget' && budget_date_string == new_date_formatted.slice(0,6)){
+        if (budget_category == 'Budget' && budget_date_string == new_sheet_name.slice(0,6)){
           budget_name = curName;
           break;
         }
@@ -41,7 +45,7 @@ function Duplicate_Budget() {
 
       if (budget_name != null) {
         // 'Spending' sheet should always come before 'Budget' sheet for that month
-        NewSheetSpending(newDate, new_date_formatted, sheet_index-1);
+        NewSheetSpending(newDate, new_sheet_name, sheet_index-1);
       } else {
         throw ("Error: Budget Sheet not yet created for this month. Please create Budget Sheet first")
       }
